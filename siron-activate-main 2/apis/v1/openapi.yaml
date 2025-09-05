@@ -1,0 +1,1256 @@
+openapi: 3.1.0
+info:
+  contact:
+    name: Informatique-MTF S.A.
+  description: Provide functionality for feature licensing management
+  title: Siron Activate REST API
+  version: v1.4.0
+
+servers:
+  - url: https://siron-activate.imtf-group.com
+    description: Production server (uses live data)
+  - url: https://licensing-service.vmo-dev-licensing.dev.imtf-group.com
+    description: Sandbox server (uses test data)
+
+tags:
+  - name: capabilities
+    description: Endpoints for managing capabilities
+  - name: customers
+    description: Endpoints for managing customers
+  - name: licenses
+    description: Endpoints for managing licenses and signing them
+  - name: internalLicenses
+    description: Endpoints for managing internal licenses
+  - name: audit
+    description: Endpoints for accessing audit information
+  - name: import-export
+    description: Endpoints for accessing the import/export functionalities
+  - name: health-check
+    description: Endpoints for checking the health of the application (readiness,liveness)
+
+security:
+  - openId:
+      - user
+      - license-issuer
+      - license-user
+      - admin
+
+paths:
+  /licensing/api/v1/capabilities:
+    post:
+      operationId: registerCapability
+      tags:
+        - capabilities
+      summary: Register a capability and its optional corresponding features.
+      security:
+        - openId:
+            - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Capability'
+            examples:
+              Capability static example without features:
+                value:
+                  name: acm
+              Capability static example:
+                value:
+                  name: acm
+                  features:
+                    - name: Feature A
+                    - name: Feature B
+
+        description: The capability with its optional features to register
+
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capability'
+              examples:
+                Capability static example without feature:
+                  value:
+                    oid: 694bfe51-1731-43aa-8fef-670e3f249c0a
+                    name: 'acm'
+                Capability static example:
+                  value:
+                    oid: ca88e94e-e9f2-4c3d-9ae0-ae5b029c13d3
+                    name: acm
+                    features:
+                      - name: Feature A
+                      - name: Feature B
+
+          description: The successfully registered capability
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Error when validating the request
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+    get:
+      operationId: getRegisteredCapabilities
+      tags:
+        - capabilities
+      summary: Return a list of all registered capabilities and their corresponding features.
+      security:
+        - openId:
+            - user
+            - license-issuer
+            - admin
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Capability'
+              examples:
+                Capability static example without feature:
+                  value:
+                    - oid: daa26016-41eb-4b64-bfd3-3cbf48194dd8
+                      name: acm
+                    - oid: 8ece7ce2-2266-41cc-9cc6-4d374bbd3448
+                      name: detect
+                Capability static example:
+                  value:
+                    - oid: 699c826f-f342-41e2-a080-afaa7f620c22
+                      name: acm
+                      features:
+                        - name: Feature A
+                        - name: Feature B
+                    - oid: 43969a29-db0e-4916-b661-a9dda10f85f0
+                      name: detect
+                      features:
+                        - name: Feature A
+
+
+          description: The registered capabilities
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+  /licensing/api/v1/capabilities/{oid}:
+    put:
+      operationId: updateCapability
+      tags:
+        - capabilities
+      summary: Update an capability given by its oid (override).
+      security:
+        - openId:
+            - admin
+      parameters:
+        - in: path
+          name: oid
+          schema:
+            type: string
+          required: true
+          description: the oid of the capability to update
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Capability'
+            examples:
+              Capability static example wihtout features:
+                value:
+                  oid: 61142af3-a38b-46f7-9b1f-50a9f6d0e4b1
+                  name: acm
+              Capability static example:
+                value:
+                  oid: 01658bfd-2e8c-4acc-981c-a44c312a4ff2
+                  name: acm
+                  features:
+                    - name: Feature A
+                    - name: Feature B
+
+        description: The capability to update. The oid of the capability request body will be ignored and overriden by the one provided as path parameter.
+
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capability'
+              examples:
+                Capability static example without feature:
+                  value:
+                    oid: ad4d047e-e301-4daa-a2f9-f6d0600219e9
+                    name: 'acm'
+                Capability static example:
+                  value:
+                    oid: ea7b8550-840f-49e4-8d8e-c41f774bdc74
+                    name: acm
+                    features:
+                      - name: Feature A
+                      - name: Feature B
+
+          description: The successfully registered capability
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Error when validating the request
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL or capability oid not found
+
+    delete:
+      operationId: deleteCapability
+      tags:
+        - capabilities
+      summary: Delete an capability given by its oid.
+      security:
+        - openId:
+            - admin
+      parameters:
+        - in: path
+          name: oid
+          schema:
+            type: string
+          required: true
+          description: the oid of the capability to update
+
+      responses:
+        "204":
+          description: Capability successfully deleted
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL or capability oid not found
+
+  /licensing/api/v1/customers:
+    post:
+      operationId: addCustomer
+      tags:
+        - customers
+      summary: Add a new customer
+      security:
+        - openId:
+            - license-issuer
+            - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+            examples:
+              Static example:
+                value:
+                  name: John Doe
+        description: the customer to add
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+              examples:
+                Static example:
+                  value:
+                    oid: 37375334-1066-4b2e-88a8-814c59c4010f
+                    name: John Doe
+          description: The registered customer
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+    get:
+      operationId: getCustomers
+      tags:
+        - customers
+      summary: Return the list of all customers
+      security:
+        - openId:
+            - user
+            - license-issuer
+            - admin
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+              examples:
+                Static example:
+                  value:
+                    - oid: 24accaf8-c274-4041-ad14-c3a5b48c6327
+                      name: John Doe
+                    - oid: 6e761ba6-37a5-480b-9455-8b4a2ed916af
+                      name: Jane Doe
+
+          description: The list of all customers
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+  /licensing/api/v1/customers/{oid}:
+    put:
+      operationId: updateCustomer
+      tags:
+        - customers
+      summary: Update an existing customer given by its oid (override)
+      security:
+        - openId:
+            - admin
+      parameters:
+        - in: path
+          name: oid
+          schema:
+            type: string
+          required: true
+          description: the oid of the customer to update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+            examples:
+              Static example:
+                value:
+                  oid: 8315f9c6-3383-45bf-8154-2c06cee5ddb8
+                  name: John Doe
+
+        description: the customer to update
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+              examples:
+                Static example:
+                  value:
+                    oid: b813ac63-29be-494b-88af-7e4d5a967e9c
+                    name: John Doe
+
+          description: The updated customer
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL or customer oid not found
+
+    delete:
+      operationId: deleteCustomer
+      tags:
+        - customers
+      summary: Delete an existing customer given by its oid
+      security:
+        - openId:
+            - admin
+      parameters:
+        - in: path
+          name: oid
+          schema:
+            type: string
+          required: true
+          description: the oid of the customer to update
+      responses:
+        "204":
+          description: Customer successfully deleted
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL or customer oid not found
+
+  /licensing/api/v1/licenses:
+    post:
+      operationId: createLicense
+      tags:
+        - licenses
+      summary: Create a new license for a capability
+      security:
+        - openId:
+            - license-issuer
+            - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/License'
+            examples:
+              Static example:
+                value:
+                  productName: My Awesome App
+                  customerId: johnDoe1234
+                  customerName: John Doe
+                  creationDate: "2023-02-15T14:30:00.000Z"
+                  expirationDate: "2025-03-01"
+
+        description: The license to create
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/License'
+              examples:
+                Static example:
+                  value:
+                    oid: c3bf8ae1-f0b5-4535-8805-7c41909855c7
+                    productName: My Awesome App
+                    customerId: johnDoe1234
+                    customerName: John Doe
+                    creationDate: "2023-02-15T14:30:00.000Z"
+                    expirationDate: "2025-03-01"
+
+          description: The create license
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Error when validating the request
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+    get:
+      operationId: getLicenses
+      tags:
+        - licenses
+      summary: Get all licenses registered in the system
+      security:
+        - openId:
+            - user
+            - license-issuer
+            - admin
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/License'
+              examples:
+                Static example:
+                  value:
+                    - oid: 590a6155-706d-47f4-9442-39da913643a4
+                      productName: My Awesome App
+                      customerId: johnDoe1234
+                      customerName: John Doe
+                      creationDate: "2023-02-15T14:30:00.000Z"
+                      expirationDate: "2025-03-01"
+                    - oid: 23456789-0123-4567-8901-234567890123
+                      productName: My Other App
+                      customerId: janeDoe9876
+                      customerName: Jane Doe
+                      creationDate: "2024-06-15T10:30:00.000Z"
+                      expirationDate: "2026-09-01"
+
+          description: A list of all licenses registered in the system
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+  /licensing/api/v1/licenses/{oid}:
+    get:
+      operationId: getLicense
+      tags:
+        - licenses
+      summary: Get a license by its oid
+      security:
+        - openId:
+            - user
+            - license-issuer
+            - admin
+      parameters:
+        - in: path
+          name: oid
+          schema:
+            type: string
+          required: true
+          description: the oid of the license to load
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/License'
+              examples:
+                Static example:
+                  value:
+                    oid: ec0acfcd-b4dd-4ce9-af19-34248d8769a1
+                    productName: My Awesome App
+                    customerId: johnDoe1234
+                    customerName: John Doe
+                    creationDate: "2023-02-15T14:30:00.000Z"
+                    expirationDate: "2025-03-01"
+
+          description: The license corresponding to the oid passed as parameter
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL or license oid not found
+    delete:
+      operationId: deleteLicense
+      tags:
+        - licenses
+      summary: Delete a license key. Once a license has been signed, it can not be deleted anymore.
+      security:
+        - openId:
+            - license-issuer
+            - admin
+      parameters:
+        - in: path
+          name: oid
+          schema:
+            type: string
+          required: true
+          description: the oid of the license to delete
+      responses:
+        "204":
+          description: License successfully deleted
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized, or license has been signed and therefore can not be deleted anymore.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL or license oid not found
+
+
+  /licensing/api/v1/licenses/{oid}/sign:
+    post:
+      operationId: signLicense
+      tags:
+        - licenses
+      summary: Sign a license given by its oid
+      security:
+        - openId:
+            - license-user
+            - license-issuer
+            - admin
+      parameters:
+        - in: path
+          name: oid
+          schema:
+            type: string
+          required: true
+          description: the oid of the license to sign
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedLicenseString'
+              example:
+                value: eyJtZXRhZGF0YSI6eyJjdXN0b21lcklkIjoiaW10Zi1pbnRlcm5hbC1kZXYiLCJjdXN0b21lck5hbWUiOiJJTVRGIChpbnRlcm5hbCBkZXYpIiwiY3JlYXRpb25EYXRlIjoiMjAyNC0wOS0yMyIsImV4cGlyYXRpb25EYXRlIjoiMjAyNS0wMS0xMCIsInByb2R1Y3ROYW1lIjoiYWNtIiwic2NoZW1hVmVyc2lvbiI6MX0sInNpZ25hdHVyZSI6Ik52c2JaV0lqTE9DSVk0M3VacFFkQmorNWlSaVp0Y1JraVFjRDdEWjZiVnFxTzdvZklpYlo4clBYV2dPTm9Bcm5iWmgyd3lldXZOOUF0cUVXaWRiaE0wdmlocjRoMTEyeHJVY1FaNDZEQzNCbG0vUEwydXhjamhzNmR6ZXl3Q0JuZHEwMnlPV2FPWUhnL0trdjIzT1E3ZlVqSVAvU3lEWnFYd1hYRHdIckREbGduRVZwa2JyQ1lz4NWVWSHZrVG1ZVFV3Sk9CWGJmK3crR0RFMFV0R0hYSk1ZUFVjc05zaWVnbjIzdEY2Y0wyTWFvbDZPVENEVGFrSElPRlF6TzRQVEpDYzRMM2JQZnNMVk9ORitaV1o1NmlTTi9hUG9TeGdRdHpObmgyRXYrWS9veVhPdElYdE8xZkw5d0V6S2k0NDVsd0dIcTUwVGhyZm5HQkEwbTFPdz09In0
+          description: The signed license encoded as base64
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL or license oid not found
+
+  /licensing/api/v1/internal-licenses/:
+    post:
+      operationId: createInternaLicense
+      tags:
+        - internalLicenses
+
+      summary: Create a short duration internal license
+
+      security:
+        - openId:
+            - user
+            - license-issuer
+            - admin
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternalLicense'
+            examples:
+              Static example:
+                value:
+                  capabilities: [ acm, aml]
+                  customer: internal-imtf-dev-license
+                  licenseInformation: Internal license for dev env
+                  contactEmail: t@m.c
+
+
+        description: The license to create
+
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedLicenseString'
+              example:
+                value: eyJtZXRhZGF0YSI6eyJjdXN0b21lcklkIjoiaW10Zi1pbnRlcm5hbC1kZXYiLCJjdXN0b21lck5hbWUiOiJJTVRGIChpbnRlcm5hbCBkZXYpIiwiY3JlYXRpb25EYXRlIjoiMjAyNC0wOS0yMyIsImV4cGlyYXRpb25EYXRlIjoiMjAyNS0wMS0xMCIsInByb2R1Y3ROYW1lIjoiYWNtIiwic2NoZW1hVmVyc2lvbiI6MX0sInNpZ25hdHVyZSI6Ik52c2JaV0lqTE9DSVk0M3VacFFkQmorNWlSaVp0Y1JraVFjRDdEWjZiVnFxTzdvZklpYlo4clBYV2dPTm9Bcm5iWmgyd3lldXZOOUF0cUVXaWRiaE0wdmlocjRoMTEyeHJVY1FaNDZEQzNCbG0vUEwydXhjamhzNmR6ZXl3Q0JuZHEwMnlPV2FPWUhnL0trdjIzT1E3ZlVqSVAvU3lEWnFYd1hYRHdIckREbGduRVZwa2JyQ1lz4NWVWSHZrVG1ZVFV3Sk9CWGJmK3crR0RFMFV0R0hYSk1ZUFVjc05zaWVnbjIzdEY2Y0wyTWFvbDZPVENEVGFrSElPRlF6TzRQVEpDYzRMM2JQZnNMVk9ORitaV1o1NmlTTi9hUG9TeGdRdHpObmgyRXYrWS9veVhPdElYdE8xZkw5d0V6S2k0NDVsd0dIcTUwVGhyZm5HQkEwbTFPdz09In0
+          description: The signed license encoded as base64
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+  /licensing/api/v1/audit:
+    get:
+      operationId: getAuditLogs
+      tags:
+        - audit
+      summary: Get all audit log entries
+      security:
+        - openId:
+            - admin
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditLog'
+              examples:
+                Static example:
+                  value:
+                    - oid: 6ca6280b-a6fb-4a78-aba8-03933b190f2e
+                      scope: CAPABILITIES
+                      effect: CREATE
+                      principal: john.doe@imtf.com
+                      timestamp: "2023-02-15T14:30:00.000Z"
+                      payload: {"oid":"adb28e49-62e3-45b9-b4db-8807fdb0160d","name":"acm"}
+                    - oid: 6ca6280b-a6fb-4a78-aba8-03933b190f2e
+                      scope: LICENSE
+                      effect: SIGN
+                      principal: sales@imtf.com
+                      timestamp: "2023-02-15T14:30:00.000Z"
+                      payload: {"oid":"adb28e49-62e3-45b9-b4db-8807fdb0160d","name":"acm"}
+
+          description: A list of audit log
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL or license oid not found
+
+  /licensing/api/v1/csv/load:
+    post:
+      operationId: importLicenses
+      tags:
+        - import-export
+      summary: Import licenses, capabilities and customers from a csv file located on the filesystem.
+      security:
+        - openId:
+            - admin
+      responses:
+        "200":
+          description: CSV file successfully loaded
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Error when validating the request
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+  /licensing/api/v1/csv/download:
+    get:
+      operationId: downloadLicenses
+      tags:
+        - import-export
+      summary: Download licenses, capabilities and customers as a csv file.
+      deprecated: true
+      security:
+        - openId:
+            - admin
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: Return the exported CSV file
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Error when validating the request
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+  /licensing/api/v1/csv/unload:
+    post:
+      operationId: exportLicenses
+      tags:
+        - import-export
+      summary: Export licenses, capabilities and customers a csv file located on the filesystem.
+      deprecated: true
+      security:
+        - openId:
+            - admin
+      responses:
+        "200":
+          description: CSV file successfully exported
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Error when validating the request
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+  /licensing/api/v1/json/load:
+    post:
+      operationId: jsonImport
+      tags:
+        - import-export
+      summary: Load licenses as JSON. This API will override all licenses stored in the system.
+      security:
+        - openId:
+            - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/License'
+            examples:
+              Static example:
+                value:
+                  - oid: 6ca6280b-a6fb-4a78-aba8-03933b190f2e
+                    capabilities: ["acm", "aml"]
+                    productName: acm
+                    customerId: johnDoe1234
+                    customerName: John Doe
+                    creationDate: "2023-02-15T14:30:00.000Z"
+                    expirationDate: "2025-03-01"
+                    contactEmail: v@t.com
+                  - oid: 8dd8bfc3-4c23-40ba-86a1-c7899f9265c8
+                    capabilities: ["ccm", "aml"]
+                    productName: ""
+                    customerId: johnDoe1234
+                    customerName: John Doe
+                    creationDate: "2023-02-15T14:30:00.000Z"
+                    expirationDate: "2025-03-01"
+                    contactEmail: v@t.com
+
+        description: The licenses to import
+      responses:
+        "204":
+          description: Licenses imported successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Error when validating the request
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+  /licensing/api/v1/json/download:
+    get:
+      operationId: jsonExport
+      tags:
+        - import-export
+      summary: Download all licenses stored in the system as JSON.
+      security:
+        - openId:
+            - admin
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/License'
+              examples:
+                Static example:
+                  value:
+                    - oid: 6ca6280b-a6fb-4a78-aba8-03933b190f2e
+                      capabilities: ["acm", "aml"]
+                      productName: acm
+                      customerId: johnDoe1234
+                      customerName: John Doe
+                      creationDate: "2023-02-15T14:30:00.000Z"
+                      expirationDate: "2025-03-01"
+                      contactEmail: v@t.com
+                    - oid: 8dd8bfc3-4c23-40ba-86a1-c7899f9265c8
+                      capabilities: ["ccm", "aml"]
+                      productName: ""
+                      customerId: johnDoe1234
+                      customerName: John Doe
+                      creationDate: "2023-02-15T14:30:00.000Z"
+                      expirationDate: "2025-03-01"
+                      contactEmail: v@t.com
+
+
+          description: A list of licenses
+        "401":
+          description: Error when authenticating
+        "403":
+          description: User is not authorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: URL not found
+
+  /health:
+    description: MicroProfile Health Endpoint
+    summary: MicroProfile Health provides a way for your application to distribute
+      information about its healthiness state to state whether or not it is able to
+      function properly
+    get:
+      operationId: microprofile_health_root
+      description: Check the health of the application
+      tags:
+        - health-check
+      summary: "An aggregated view of the Liveness, Readiness and Startup of this\
+        \ application"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /health/liveness:
+    description: MicroProfile Health - Liveness Endpoint
+    summary: Liveness checks are utilized to tell whether the application should be
+      restarted
+    get:
+      operationId: microprofile_health_liveness
+      description: Check the liveness of the application
+      tags:
+        - health-check
+      summary: The Liveness check of this application
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /health/readiness:
+    description: MicroProfile Health - Readiness Endpoint
+    summary: Readiness checks are used to tell whether the application is able to
+      process requests
+    get:
+      operationId: microprofile_health_readiness
+      description: Check the readiness of the application
+      tags:
+        - health-check
+      summary: The Readiness check of this application
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+  /health/started:
+    description: MicroProfile Health - Startup Endpoint
+    summary: Startup checks are an used to tell when the application has started
+    get:
+      operationId: microprofile_health_startup
+      description: Check the startup of the application
+      tags:
+        - health-check
+      summary: The Startup check of this application
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+
+components:
+  securitySchemes:
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://keycloak.imtf-group.com/realms/imtf/.well-known/openid-configuration
+      description: oidc connected to imtf internal keycloak
+
+  schemas:
+    Capability:
+      type: object
+      description: An capability's definition registered
+      properties:
+        oid:
+          type: string
+          description: the technical uuid assigned to the capability
+        name:
+          type: string
+          description: The name of the capability
+        features:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: feature name
+            required:
+              - name
+      required:
+        - name
+
+    Customer:
+      type: object
+      description: A customer representation
+      properties:
+        oid:
+          type: string
+          description: the technical uuid assigned to the customer
+        name:
+          type: string
+          description: The name of the customer
+      required:
+        - name
+
+    License:
+      type: object
+      description: the license definition
+      properties:
+        oid:
+          type: string
+          description: the technical uuid assigned to the license
+        capabilities:
+          type: array
+          description: a list of capability names for which the license has been created.
+          items:
+            type: string
+        productName:
+          type: string
+          description: the name of the product for which the license has been created, it needs to match an already registered capability.
+        customerId:
+          type: string
+          description: a string id representing the customer for which the license has been created.
+        customerName:
+          type: string
+          description: the display name of the customer for which the license has been created. Usually, the value of this field is displayed in the capability using the license.
+        creationDate:
+          type: string
+          format: date-time
+          description: the creation date of the license
+        expirationDate:
+          type: string
+          format: date
+          description: the expiration date of the license
+        signatureDate:
+          type: string
+          format: date-time
+          description: the date of the first signature of the license (deprecated since 1.1.0)
+          deprecated: true
+        signedBy:
+          type: string
+          description: the name of the user who first signed the license (deprecated since 1.1.0)
+          deprecated: true
+        contactEmail:
+          type: string
+          format: email
+          description: contact information, email or name, about the owner of this license
+      required:
+        - productName
+        - customerId
+        - customerName
+        - creationDate
+
+    InternalLicense:
+      type: object
+      description: internal license definition
+      properties:
+        capabilities:
+          type: array
+          description: a list of capability names for which this license will be created. The list of available capabilities can be retrieved by calling the GET capabilities endpoint.
+          items:
+            type: string
+        customer:
+          type: string
+          description: a string representing the customer for which the license has been created. The list of allowed customers can be retrieved by calling the GET customers endpoint.
+        licenseInformation:
+          type: string
+          description: A string for additional information regarding the license.
+        contactEmail:
+          type: string
+          format: email
+          description: contact information, email or name, about the owner of this license
+      required:
+        - capabilities
+        - customer
+        - licenseInformation
+
+    SignedLicenseString:
+      type: object
+      description: a signed license
+      properties:
+        value:
+          type: string
+          description: base64 hash of the signed license
+
+    AuditLog:
+      type: object
+      description: an audit log entry
+      properties:
+        oid:
+          type: string
+          description: the technical uuid assigned to the audit entry
+        scope:
+          type: string
+          description: the scope on which this audit log entry applies.
+        effect:
+          type: string
+          description: the effect referred by this audit log entry.
+        principal:
+          type: string
+          description: the principal name responsible for the action described by this audit entry.
+        timestamp:
+          type: string
+          format: date-time
+          description: the timestamp of the event.
+        payload:
+          type: object
+          description: a json representation of the object affected by the effect
+      required:
+        - scope
+        - effect
+        - timestamp
+
+    ErrorResponse:
+      type: object
+      description: Error is used to return the error details inside error response
+        object
+      properties:
+        code:
+          type: string
+          description: Unique identifier of the error type
+        message:
+          type: string
+          description: Simple message describing the error
+        timestamp:
+          type: string
+          format: date-time
+          description: Exact time of the error, UTC based with ISO-8601 format
+        spanId:
+          type: string
+          description: If available, the OpenTracing span Id
+        traceId:
+          type: string
+          description: If available, the OpenTracing trace Id
+      required:
+        - code
+        - message
+        - timestamp
+
+    HealthResponse:
+      type: object
+      properties:
+        checks:
+          type: array
+          items:
+            $ref: "#/components/schemas/HealthCheck"
+        status:
+          type: string
+          enum:
+            - UP
+            - DOWN
+    HealthCheck:
+      type: object
+      properties:
+        data:
+          type:
+            - object
+            - "null"
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+            - UP
+            - DOWN

@@ -1,0 +1,58 @@
+---
+name: Build main branch
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ vars.RUNNER_IMTF_BASIC }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Configure AWS Deploy credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        id: aws-central-resources-credentials
+        with:
+          aws-access-key-id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: get CodeArtifact token
+        uses: imtf-group/public-actions/codeartifact-login@v14
+        with:
+          domain-owner: "028952730777"
+          domains: |
+            imtf-snapshots: CODEARTIFACT_AUTH_TOKEN_SNAPSHOTS
+            imtf-releases: CODEARTIFACT_AUTH_TOKEN_RELEASES
+
+      - name: Maven build and test all
+        run: ./mvnw --settings ./.mvn/settings.xml clean package
+        env:
+          TESTCONTAINERS_RYUK_DISABLED: true
+          TESTCONTAINERS_CHECKS_DISABLE: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.IMAGE_NAME }}:develop
+          platforms: linux/amd64,linux/arm64

@@ -1,0 +1,11 @@
+.identity > span + span {
+  @media screen and (max-width: 599px) {
+    font-size: 0.75em;
+  }
+}
+
+.menuButton {
+  @media screen and (min-width: 600px) {
+    display: none;
+  }
+}

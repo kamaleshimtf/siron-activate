@@ -1,0 +1,7 @@
+.footer {
+  display: grid;
+
+  @container two-pane-layout (min-width: 600px) {
+    display: none;
+  }
+}

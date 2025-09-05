@@ -1,0 +1,53 @@
+name: Sync OpenAPI Spec
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'apis/v1/openapi.yaml'
+
+jobs:
+  validate-and-sync:
+    runs-on: ${{ vars.RUNNER_IMTF_BASIC }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate OpenAPI Spec
+        run: |
+          npm install -g @stoplight/spectral-cli
+          spectral lint apis/v1/openapi.yaml
+
+      - name: Checkout central registry (default branch)
+        uses: actions/checkout@v4
+        with:
+          repository: imtf-group/siron-one-api
+          ref: vmo/test-sync
+          token: ${{ secrets.SERVICE_ACCOUNT_PAT}}
+          path: siron-one-api
+
+      - name: Prepare structure
+        run: |
+          mkdir compare
+          cp apis/v1/openapi.yaml compare/new.yaml
+          cp siron-one-api/apis/siron-activate/v1/openapi.yaml compare/old.yaml
+
+      - name: Login to Harbor
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.OCI_HOST }}
+          username: ${{ vars.OCI_RO_USERNAME }}
+          password: ${{ secrets.OCI_RO_PASSWORD }}
+
+      - name: OpenAPI diff
+        run: |
+          docker run --rm -t -v $(pwd)/compare:/specs:ro openapitools/openapi-diff:latest /specs/old.yaml /specs/new.yaml --fail-on-incompatible
+          

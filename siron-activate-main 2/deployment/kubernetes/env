@@ -1,0 +1,11 @@
+export AUTH_SECRET=KBtRqkCO4Pu0Ri+cwGXFtjvXLLfqna30L9XS8eiZ7rw=
+export AUTH_OIDC_ISSUER=https://keycloak.imtf-group.com/realms/imtf
+export AUTH_OIDC_CLIENT_ID=siron-activate
+export AUTH_OIDC_CLIENT_SECRET=wrexCy0cRHL6iyFiHYs4azf8KigP47xb
+export AUTH_TRUST_HOST=true
+export API_URL_PUBLIC=http://localhost:8080
+export QUARKUS_OIDC_AUTH_SERVER_URL=https://keycloak.imtf-group.com/realms/imtf
+export QUARKUS_OIDC_CLIENT_ID=siron-activate
+export QUARKUS_OIDC_CREDENTIALS_SECRET=wrexCy0cRHL6iyFiHYs4azf8KigP47xb
+export  QUARKUS_HTTP_CORS=true
+export QUARKUS_HTTP_CORS_ORIGINS=/.*/

@@ -1,0 +1,32 @@
+---
+name: Build and publish on release
+on:
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        type: string
+        required: true
+        description: version tag (vX.Y.Z)
+  release:
+    types:
+      - published
+
+jobs:
+  prepare-docker-tag:
+    name: Prepare docker tag
+    runs-on: ${{ vars.RUNNER_IMTF_BASIC }}
+    outputs:
+      docker_tag: ${{ steps.compute_tag.outputs.docker_tag }}
+    steps:
+      - id: compute_tag
+        run: |
+          VERSION=${{ github.event.release.tag_name || inputs.version_tag }}
+          echo "docker_tag=${VERSION:1}" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build stage
+    uses: ./.github/workflows/build.yaml
+    needs: prepare-docker-tag
+    secrets: inherit
+    with:
+      docker-tag: ${{ needs.prepare-docker-tag.outputs.docker_tag }}

@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minimal-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-route53-oidc
+spec:
+  ingressClassName: kong
+  rules:
+    - host: siron-activate.imtf-group.com
+      http:
+        paths:
+          - path: /licensing/api
+            pathType: Prefix
+            backend:
+              service:
+                name: licensing-service
+                port:
+                  name: http
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fe-licensing-service
+                port:
+                  name: fe-http
+  tls:
+    - hosts:
+        - siron-activate.imtf-group.com
+      secretName: siron-activate.imtf-group.com

@@ -1,0 +1,25 @@
+ProductId,CustomerId,CustomerName,CreationDate,ExpirationDate,Contact
+acm,imtf-internal-kabru,IMTF (internal dev kabru),23-09-2024,31-03-2025,gunter.martens@imtf.com
+acm,imtf-internal-dev,IMTF (internal dev),23-09-2024,10-01-2025,julien.leroy@imtf.com
+acm,imtf-internal-dev,IMTF (internal dev),14    -01-2025,10-03-2025,julien.leroy@imtf.com
+acm,imtf-internal-demo,IMTF (internal demo),23-09-2024,10-01-2025,julien.leroy@imtf.com
+acm,imtf-internal-demo,IMTF (internal demo),14-01-2025,10-03-2025,julien.leroy@imtf.com
+acm,imtf-internal-softops,IMTF (internal software operation),18-10-2024,18-10-2025,sergei.romanow@imtf.com
+acm,luminor,Luminor (development),18-10-2024,30-09-2026,sergei.romanow@imtf.com
+acm,luminor,Luminor (staging),18-10-2024,30-09-2026,sergei.romanow@imtf.com
+acm,hsbc,HSBC (staging),18-10-2024,17-03-2026,sergei.romanow@imtf.com
+acm,hsbc,HSBC (pre-production),18-10-2024,17-03-2026,sergei.romanow@imtf.com
+acm,hsbc,HSBC (production),18-10-2024,17-03-2026,sergei.romanow@imtf.com
+acm,islandsbanki,Islandsbanki (staging),18-10-2024,31-12-2026,sergei.romanow@imtf.com
+acm,islandsbanki,Islandsbanki (production),18-10-2024,31-12-2026,sergei.romanow@imtf.com
+acm,union-it-services,Union-IT (development),18-10-2024,31-03-2029,sergei.romanow@imtf.com
+acm,union-it-services,Union-IT (staging),18-10-2024,31-03-2029,sergei.romanow@imtf.com
+acm,union-it-services,Union-IT (production),18-10-2024,31-03-2029,sergei.romanow@imtf.com
+acm,jordan-ahli-bank,Jordan Ahli Bank,21-10-2024,01-01-2026,nada.almadmouj@imtf.com
+acm,equifax,Equifax (development),07-11-2024,31-12-2025,sergei.romanow@imtf.com
+acm,equifax,Equifax (staging),07-11-2024,31-12-2025,sergei.romanow@imtf.com
+acm,equifax,Equifax (production),07-11-2024,31-12-2025,sergei.romanow@imtf.com
+acm,equifax,Equifax (production 2),07-11-2024,31-12-2025,sergei.romanow@imtf.com
+acm,sgkb,SGKB (sys),08-01-2025,08-01-2028,dakshinasingh.bais@imtf.com
+acm,sgkb,SGKB (uat),08-01-2025,08-01-2028,dakshinasingh.bais@imtf.com
+acm,sgkb,SGKB (prod),08-01-2025,08-01-2028,dakshinasingh.bais@imtf.com

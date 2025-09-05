@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: licensing-service-deployment
+  labels:
+    app: licensing-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: licensing-service
+  template:
+    metadata:
+      labels:
+        app: licensing-service
+    spec:
+      containers:
+        - name: licensing-service
+          imagePullPolicy: Always
+          image: 028952730777.dkr.ecr.eu-west-1.amazonaws.com/siron-activate/license-service:develop
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: QUARKUS_MONGODB_CONNECTION-STRING
+              value: mongodb://mongodb:27017
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-access-key
+                  key: accessKey
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-access-key
+                  key: secretAccessKey
+            - name: QUARKUS_OIDC_AUTH_SERVER_URL
+              value: https://keycloak.imtf-group.com/realms/imtf
+            - name: QUARKUS_OIDC_CLIENT_ID
+              value: siron-activate
+            - name: QUARKUS_OIDC_CREDENTIALS_SECRET
+              value: wrexCy0cRHL6iyFiHYs4azf8KigP47xb
+            - name: QUARKUS_OIDC_TENANT_ENABLED
+              value: "true"
+            - name: SIRON_ACTIVATE_CSV_IMPORTER_FILE
+              value: "/tmp/siron-activate.csv"
+            - name: QUARKUS_PROFILE
+              value: "prod"
+            - name: QUARKUS_OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-opentelemetry-collector.vmo-monitoring-test.svc.cluster.local:4317"
+

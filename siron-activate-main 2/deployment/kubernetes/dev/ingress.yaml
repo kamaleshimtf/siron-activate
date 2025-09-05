@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minimal-ingress
+spec:
+  ingressClassName: kong
+  rules:
+    - host: licensing-service.vmo-dev-licensing.dev.imtf-group.com
+      http:
+        paths:
+          - path: /licensing/api
+            pathType: Prefix
+            backend:
+              service:
+                name: licensing-service
+                port:
+                  name: http
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fe-licensing-service
+                port:
+                  name: fe-http
+  tls:
+    - hosts:
+        - licensing-service.vmo-dev-licensing.dev.imtf-group.com
+      secretName: vmo-dev-licensing.dev.imtf-group.com

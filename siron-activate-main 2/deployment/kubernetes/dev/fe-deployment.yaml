@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fe-licensing-deployment
+  labels:
+    app: fe-licensing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fe-licensing
+  template:
+    metadata:
+      labels:
+        app: fe-licensing
+    spec:
+      containers:
+        - name: fe-licensing
+          imagePullPolicy: Always
+          image: 028952730777.dkr.ecr.eu-west-1.amazonaws.com/siron-activate/frontend:latest
+          ports:
+            - containerPort: 3000
+              name: fe-http
+          env:
+            - name: AUTH_SECRET
+              value: KBtRqkCO4Pu0Ri+cwGXFtjvXLLfqna30L9XS8eiZ7rw=
+            - name: AUTH_OIDC_ISSUER
+              value: https://keycloak.imtf-group.com/realms/imtf
+            - name: AUTH_OIDC_CLIENT_ID
+              value: siron-activate
+            - name: AUTH_OIDC_CLIENT_SECRET
+              value: wrexCy0cRHL6iyFiHYs4azf8KigP47xb
+            - name: API_URL
+              value: http://licensing-service:80
+            - name: API_URL_PUBLIC
+              value: https://licensing-service.vmo-dev-licensing.dev.imtf-group.com

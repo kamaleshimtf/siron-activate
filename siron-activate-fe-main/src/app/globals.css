@@ -1,0 +1,18 @@
+@import "@imtf/panache/styles/layers.css";
+@import "@imtf/panache/styles/style.css";
+@import "@imtf/panache/styles/color-palette.css";
+
+@import "@fontsource/roboto/300.css" layer(global);
+@import "@fontsource/roboto/400.css" layer(global);
+@import "@fontsource/roboto/500.css" layer(global);
+@import "@fontsource/roboto/700.css" layer(global);
+
+@layer global {
+
+  html,
+  body {
+    height: 100%;
+    font-family: Roboto, Arial, sans-serif;
+    margin: 0;
+  }
+}

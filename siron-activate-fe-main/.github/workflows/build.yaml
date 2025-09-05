@@ -1,0 +1,57 @@
+---
+name: Build and push
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      docker-tag:
+        type: string
+        required: true
+
+jobs:
+  build-and-push:
+    name: Build and push
+    runs-on: ${{ vars.RUNNER_IMTF_BASIC }}
+    env:
+      DOCKER_TAG: ${{ inputs.docker-tag || 'develop' }}
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Deploy credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        id: aws-central-resources-credentials
+        with:
+          aws-access-key-id: ${{ secrets.BUILD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.BUILD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Login to Harbor
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.OCI_HOST }}
+          username: ${{ vars.OCI_RO_USERNAME }}
+          password: ${{ secrets.OCI_RO_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push siron activate frontend docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ vars.AWS_ECR_REGISTRY }}/${{ vars.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

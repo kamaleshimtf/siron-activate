@@ -1,0 +1,31 @@
+networks:
+  monitoring:
+    driver: bridge
+
+services:
+  mongodb:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+
+  license-service:
+    image: license-service:1.0.0
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/tmp
+    depends_on:
+      - mongodb
+    environment:
+      - SIRON_ACTIVATE_CSV_IMPORTER_FILE=/tmp/siron-activate.csv
+      - QUARKUS_MONGODB_CONNECTION-STRING=mongodb://mongodb:27017
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - QUARKUS_OIDC_AUTH_SERVER_URL
+      - QUARKUS_OIDC_CLIENT_ID
+      - QUARKUS_OIDC_CREDENTIALS_SECRET
+      - QUARKUS_LOG_LEVEL
+      - QUARKUS_HTTP_CORS=true
+      - QUARKUS_HTTP_CORS_ORIGINS=/.*/
+      - QUARKUS_HTTP_CORS_METHOD

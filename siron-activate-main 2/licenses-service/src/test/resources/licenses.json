@@ -1,0 +1,194 @@
+[
+  {
+    "ProductId": "acm",
+    "CustomerId": "imtf-internal-kabru",
+    "CustomerName": "IMTF (internal dev kabru)",
+    "CreationDate": "23-09-2024",
+    "ExpirationDate": "31-03-2025",
+    "Contact": "gunter.martens@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "imtf-internal-dev",
+    "CustomerName": "IMTF (internal dev)",
+    "CreationDate": "23-09-2024",
+    "ExpirationDate": "10-01-2025",
+    "Contact": "julien.leroy@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "imtf-internal-dev",
+    "CustomerName": "IMTF (internal dev)",
+    "CreationDate": "14-01-2025",
+    "ExpirationDate": "10-03-2025",
+    "Contact": "julien.leroy@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "imtf-internal-demo",
+    "CustomerName": "IMTF (internal demo)",
+    "CreationDate": "23-09-2024",
+    "ExpirationDate": "10-01-2025",
+    "Contact": "julien.leroy@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "imtf-internal-demo",
+    "CustomerName": "IMTF (internal demo)",
+    "CreationDate": "14-01-2025",
+    "ExpirationDate": "10-03-2025",
+    "Contact": "julien.leroy@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "imtf-internal-softops",
+    "CustomerName": "IMTF (internal software operation)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "18-10-2025",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "luminor",
+    "CustomerName": "Luminor (development)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "30-09-2026",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "luminor",
+    "CustomerName": "Luminor (staging)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "30-09-2026",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "hsbc",
+    "CustomerName": "HSBC (staging)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "17-03-2026",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "hsbc",
+    "CustomerName": "HSBC (pre-production)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "17-03-2026",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "hsbc",
+    "CustomerName": "HSBC (production)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "17-03-2026",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "islandsbanki",
+    "CustomerName": "Islandsbanki (staging)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "31-12-2026",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "islandsbanki",
+    "CustomerName": "Islandsbanki (production)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "31-12-2026",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "union-it-services",
+    "CustomerName": "Union-IT (development)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "31-03-2029",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "union-it-services",
+    "CustomerName": "Union-IT (staging)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "31-03-2029",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "union-it-services",
+    "CustomerName": "Union-IT (production)",
+    "CreationDate": "18-10-2024",
+    "ExpirationDate": "31-03-2029",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "jordan-ahli-bank",
+    "CustomerName": "Jordan Ahli Bank",
+    "CreationDate": "21-10-2024",
+    "ExpirationDate": "01-01-2026",
+    "Contact": "nada.almadmouj@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "equifax",
+    "CustomerName": "Equifax (development)",
+    "CreationDate": "07-11-2024",
+    "ExpirationDate": "31-12-2025",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "equifax",
+    "CustomerName": "Equifax (staging)",
+    "CreationDate": "07-11-2024",
+    "ExpirationDate": "31-12-2025",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "equifax",
+    "CustomerName": "Equifax (production)",
+    "CreationDate": "07-11-2024",
+    "ExpirationDate": "31-12-2025",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "equifax",
+    "CustomerName": "Equifax (production 2)",
+    "CreationDate": "07-11-2024",
+    "ExpirationDate": "31-12-2025",
+    "Contact": "sergei.romanow@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "sgkb",
+    "CustomerName": "SGKB (sys)",
+    "CreationDate": "08-01-2025",
+    "ExpirationDate": "08-01-2028",
+    "Contact": "dakshinasingh.bais@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "sgkb",
+    "CustomerName": "SGKB (uat)",
+    "CreationDate": "08-01-2025",
+    "ExpirationDate": "08-01-2028",
+    "Contact": "dakshinasingh.bais@imtf.com"
+  },
+  {
+    "ProductId": "acm",
+    "CustomerId": "sgkb",
+    "CustomerName": "SGKB (prod)",
+    "CreationDate": "08-01-2025",
+    "ExpirationDate": "08-01-2028",
+    "Contact": "dakshinasingh.bais@imtf.com"
+  }
+]
